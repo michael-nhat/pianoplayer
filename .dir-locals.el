@@ -35,7 +35,7 @@
                             (progn
                               (switch-to-buffer (get-buffer-create buffer-name))
                               (vterm-mode)))
-                        (pop-to-buffer buffer-name)
+                        (pop-to-buffer buffer-name t t)
                         (vterm-send-key (kbd "C-c"))
                         ;; error send ls while send C-c
                         (vterm-send-key (kbd "SPC"))
