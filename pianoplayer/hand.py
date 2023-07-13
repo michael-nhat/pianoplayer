@@ -170,6 +170,7 @@ class Hand:
 
     ###########################################################################################
     def generate(self, start_measure=0, nmeasures=1000):
+        note_fingered = ""
 
         if start_measure == 1:
             start_measure=0 # avoid confusion with python numbering
@@ -184,6 +185,7 @@ class Hand:
         if self.depth > 9: self.depth = 9
 
         for i in range(N):##############
+            note_fingered = ""
 
             an = self.noteseq[i]
             if an.measure:
@@ -218,17 +220,31 @@ class Hand:
                         if self.lyrics:
                             nl = len(an.chord21.pitches) - an.chordnr
                             an.chord21.addLyric(best_finger, nl)
+                            note_fingered = "chord, lyric"
                         else:
                             an.chord21.articulations.append(fng)
+                            note_fingered = "chord, articulations num"
                 else:
                     if self.lyrics:
                         an.note21.addLyric(best_finger)
+                        note_fingered = "note, lyric"
                     else:
                         an.note21.articulations.append(fng)
+                        note_fingered = "note, oarticulations num"
+            if note_fingered == "":
+                print("separate note but no fingered")
+                if an.isChord:
+                    an.chord21.addLyric("c")
+                else:
+                    an.note21.addLyric("n")
+
 
             #---------------------------------------------------------------------------- print
             if self.verbose:
-                if not best_finger: best_finger = '?'
+                if not best_finger:
+                    print("fng: ")
+                    print(fng)
+                    best_finger = '?'
                 if an.measure: print(f"meas.{an.measure: <3}", end=' ')
                 print(f"finger_{best_finger}  plays  {an.name: >2}{an.octave}", end=' ')
                 if i < N-10:

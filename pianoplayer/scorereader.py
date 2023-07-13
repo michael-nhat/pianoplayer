@@ -56,6 +56,9 @@ def reader(sf, beam=0):
             if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'):
                 # add for tie, because: is note in xml but not midi-note (add character t)
                 # and for some other not numbering, must add character x on it
+                print("tied note here")
+                n.addLyric("t")
+                print(n)
                 continue
 
         if n.isNote:
