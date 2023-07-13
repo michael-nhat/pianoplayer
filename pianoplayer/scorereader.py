@@ -22,6 +22,7 @@ class INote:
         self.NinChord = 0
         self.chordID  = 0
         self.noteID   = 0
+        self.nh_type = ""
 
 
 #####################################################
@@ -52,7 +53,10 @@ def reader(sf, beam=0):
         if n.duration.quarterLength==0 : continue
 
         if hasattr(n, 'tie'): # address bug https://github.com/marcomusy/pianoplayer/issues/29
-            if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'): continue
+            if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'):
+                # add for tie, because: is note in xml but not midi-note (add character t)
+                # and for some other not numbering, must add character x on it
+                continue
 
         if n.isNote:
             if len(noteseq) and n.offset == noteseq[-1].time:
@@ -80,6 +84,7 @@ def reader(sf, beam=0):
 
         elif n.isChord:
 
+            # this never if
             if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'): continue
             sfasam = 0.05 # sfasa leggermente le note dell'accordo
             for j, cn in enumerate(n.pitches):

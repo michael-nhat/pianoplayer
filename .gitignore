@@ -5,3 +5,7 @@ output.xml
 build/
 dist/
 pianoplayer.egg-info/
+scores/
+out/
+jul9/
+jul9
