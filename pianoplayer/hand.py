@@ -23,6 +23,7 @@ class Hand:
         self.verbose   = True
         self.lyrics    = False  # show fingering numbers as lyrics in musescore
         self.size      = size
+        self.text      = ""
 
         self.hf = utils.handSizeFactor(size)
         for i in (1,2,3,4,5):
@@ -188,6 +189,13 @@ class Hand:
             note_fingered = ""
 
             an = self.noteseq[i]
+            print("an measure:", an.measure)
+            if an.nh_type == "tied":
+                # add for tie, because: is note in xml but not midi-note (add character t)
+                # and for some other not numbering, must add character x on it
+                print("tied note")
+                an.note21.addLyric("t")
+                continue
             if an.measure:
                 if an.measure < start_measure : continue
                 if an.measure > start_measure + nmeasures : break
@@ -213,10 +221,14 @@ class Hand:
             self.fingerseq.append(list(self.cfps))
 
             if best_finger>0 and i < N-3:
+                fng = None
                 fng = Fingering(best_finger)
-                if an.isChord:
-                    if len(an.chord21.pitches) < 4:
-                        # dont show fingering in the lyrics line for >3 note-chords
+
+                if fng != None:
+                    self.text = self.text + str(best_finger)
+                    if an.isChord:
+                        # if len(an.chord21.pitches) < 4:
+                        #     # dont show fingering in the lyrics line for >3 note-chords
                         if self.lyrics:
                             nl = len(an.chord21.pitches) - an.chordnr
                             an.chord21.addLyric(best_finger, nl)
@@ -224,27 +236,26 @@ class Hand:
                         else:
                             an.chord21.articulations.append(fng)
                             note_fingered = "chord, articulations num"
-                else:
-                    if self.lyrics:
-                        an.note21.addLyric(best_finger)
-                        note_fingered = "note, lyric"
                     else:
-                        an.note21.articulations.append(fng)
-                        note_fingered = "note, oarticulations num"
+                        if self.lyrics:
+                            an.note21.addLyric(best_finger)
+                            note_fingered = "note, lyric"
+                        else:
+                            an.note21.articulations.append(fng)
+                            note_fingered = "note, oarticulations num"
             if note_fingered == "":
                 print("separate note but no fingered")
                 if an.isChord:
+                    self.text = self.text + "-"
                     an.chord21.addLyric("c")
                 else:
+                    self.text = self.text + "-"
                     an.note21.addLyric("n")
 
 
             #---------------------------------------------------------------------------- print
             if self.verbose:
-                if not best_finger:
-                    print("fng: ")
-                    print(fng)
-                    best_finger = '?'
+                if not best_finger: best_finger = '?'
                 if an.measure: print(f"meas.{an.measure: <3}", end=' ')
                 print(f"finger_{best_finger}  plays  {an.name: >2}{an.octave}", end=' ')
                 if i < N-10:

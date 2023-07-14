@@ -50,15 +50,20 @@ def reader(sf, beam=0):
 
     for n in strm:
 
-        if n.duration.quarterLength==0 : continue
+        if n.duration.quarterLength==0 :
+            print("note no length: might need correct", n)
+            continue
 
         if hasattr(n, 'tie'): # address bug https://github.com/marcomusy/pianoplayer/issues/29
             if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'):
                 # add for tie, because: is note in xml but not midi-note (add character t)
                 # and for some other not numbering, must add character x on it
-                print("tied note here")
-                n.addLyric("t")
-                print(n)
+                an        = INote()
+                an.noteID += 1
+                an.note21 = n
+                an.nh_type = "tied"
+                an.measure = n.measureNumber
+                noteseq.append(an)
                 continue
 
         if n.isNote:

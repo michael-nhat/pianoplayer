@@ -33,6 +33,8 @@ if len(sys.argv) < 2: # no args are passed, pop up GUI
             self.RightHandBeam = 0
             self.LeftHandBeam  = 1
             self.initUI()
+            self.l_text = ""
+            self.r_text = ""
 
         def initUI(self):
             self.parent.title("PianoPlayer")
@@ -73,6 +75,8 @@ if len(sys.argv) < 2: # no args are passed, pop up GUI
             dlg = tkFileDialog.Open(self, filetypes = ftypes)
             self.filename = dlg.show()
             print('Input File is ', self.filename)
+            self.l_text = ""
+            self.r_text = ""
 
         def generateCMD(self):
             sf = converter.parse(self.filename)
@@ -81,13 +85,16 @@ if len(sys.argv) < 2: # no args are passed, pop up GUI
                 self.rh = Hand("right", self.handsize.get())
                 self.rh.noteseq = reader(sf, beam=self.RightHandBeam)
                 self.rh.generate(nmeasures=self.meas.get())
+                self.r_text = self.rh.text
 
             if self.Lcb.get():
                 self.lh = Hand("left", self.handsize.get())
                 self.lh.noteseq = reader(sf, beam=self.LeftHandBeam)
                 self.lh.generate(nmeasures=self.meas.get())
+                self.l_text = self.lh.text
 
             print("Saving score to output.xml")
+            print("\n" + self.r_text + " t1: " + self.l_text)
             sf.write('xml', fp='output.xml')
             print("\nTo visualize score type:\n musescore output.xml\n")
 
@@ -118,6 +125,8 @@ else: ##########################################################################
 
     import argparse
 
+    l_text = ""
+    r_text = ""
     pr = argparse.ArgumentParser(description="""PianoPlayer,
     check out home page https://github.com/marcomusy/pianoplayer""")
     pr.add_argument("filename", type=str, help="Input music xml/midi file name")
@@ -190,6 +199,7 @@ else: ##########################################################################
 
         rh.noteseq = reader(sf, beam=args.rbeam)
         rh.generate(args.start_measure, args.n_measures)
+        r_text = rh.text
 
     if not args.right_only:
         lh = Hand("left", hand_size)
@@ -203,7 +213,11 @@ else: ##########################################################################
 
         lh.noteseq = reader(sf, beam=args.lbeam)
         lh.generate(args.start_measure, args.n_measures)
+        l_text = lh.text
 
+    print("\n" + r_text + " t1: " + l_text)
+    print("rhand: ", len(r_text))
+    print("lhand: ", len(l_text))
     sf.write('xml', fp=args.outputfile)
 
 
