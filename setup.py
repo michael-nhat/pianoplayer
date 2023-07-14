@@ -5,7 +5,7 @@ setup(
     version="2.2.1",  # change also in __init__.py
     packages=["pianoplayer"],
     scripts=["bin/pianoplayer"],
-    install_requires=["music21", "vedo"],
+    install_requires=["music21", "vedo", "pyperclip"],
     description="Automatic piano fingering generator. Finds and shows in 3D the best fingering combination to play a score.",
     long_description="""Automatic piano fingering generator.
     Finds and shows in a 3D visualization the best fingering combination to play a score.

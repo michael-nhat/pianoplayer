@@ -5,6 +5,7 @@
 #-------------------------------------------------------------------------------
 from music21.articulations import Fingering
 import pianoplayer.utils as utils
+from pprint import pprint
 
 
 #####################################################
@@ -186,16 +187,61 @@ class Hand:
         if self.depth > 9: self.depth = 9
 
         for i in range(N):##############
+
             note_fingered = ""
 
             an = self.noteseq[i]
-            print("an measure:", an.measure)
+
             if an.nh_type == "tied":
                 # add for tie, because: is note in xml but not midi-note (add character t)
                 # and for some other not numbering, must add character x on it
                 print("tied note")
-                an.note21.addLyric("t")
+                # seem it ignore if a chord tied
+                if an.isChord == True:
+                    print("log chord:", an.note21)
+                    t_chord = an.note21
+                    for n in t_chord.notes:
+                        if hasattr(n, 'tie'): # address bug https://github.com/marcomusy/pianoplayer/issues/29
+                            # if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'):
+                            print(n.tie)
+                            if n.tie == None:
+                                print("no tie")
+                                an.note21.addLyric("h")
+                                self.text = self.text + "-"
+                            else:
+                                if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'):
+                                    print("has tie", n.tie)
+                                    an.note21.addLyric("t")
+                                else:
+                                    print("has tie but not con or stop", n.tie)
+                                    self.text = self.text + "-"
+                                    an.note21.addLyric("s")
+                        else:
+                            print("no tie pro")
+                            an.note21.addLyric("T")
+                            self.text = self.text + "-"
+                else:
+                    print("log note:", an.note21)
                 continue
+
+            a = None
+            a = an.measure
+            if a == 37:
+                print("measure pre:", a, pprint(vars(an)))
+                if hasattr(an, 'isNote'):
+                    print("37xx Note", an.isNote,)
+                    if an.isNote:
+                        pprint(vars(an.note21))
+                    else:
+                        pprint(vars(an.chord21))
+                elif hasattr(an, 'isChord'):
+                    print("37xx Chord", an.isChord, )
+                    if not an.isChord:
+                        pprint(vars(an.note21))
+                    else:
+                        pprint(vars(an.chord21))
+                else:
+                    print("37xx WTF")
             if an.measure:
                 if an.measure < start_measure : continue
                 if an.measure > start_measure + nmeasures : break
@@ -205,6 +251,7 @@ class Hand:
                 self.depth = 9
 
             best_finger = 0
+            bf = None
             ninenotes = None
             if i > N-10:
                 if len(out)>1: 
@@ -225,7 +272,9 @@ class Hand:
                 fng = Fingering(best_finger)
 
                 if fng != None:
-                    self.text = self.text + str(best_finger)
+                    if not best_finger: bf = "-"
+                    else: bf = str(best_finger)
+                    self.text = self.text + bf
                     if an.isChord:
                         # if len(an.chord21.pitches) < 4:
                         #     # dont show fingering in the lyrics line for >3 note-chords
@@ -257,7 +306,7 @@ class Hand:
             if self.verbose:
                 if not best_finger: best_finger = '?'
                 if an.measure: print(f"meas.{an.measure: <3}", end=' ')
-                print(f"finger_{best_finger}  plays  {an.name: >2}{an.octave}", end=' ')
+                print(f"finger_{best_finger} bf_{bf} plays  {an.name: >2}{an.octave}  side {self.LR}", end=' ')
                 if i < N-10:
                     print(f"  v={round(vel,1)}", end='')
                     if self.autodepth:
@@ -270,7 +319,6 @@ class Hand:
                 if i and not i%100 and an.measure:
                     print('scanned', i, '/', N,
                           'notes, measure', an.measure+1, ' for the', self.LR ,'hand...')
-
 
 
 

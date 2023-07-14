@@ -8,6 +8,7 @@ import os, sys
 from music21 import converter, stream
 from pianoplayer.hand import Hand
 from pianoplayer.scorereader import reader, PIG2Stream
+import pyperclip
 
 
 if len(sys.argv) < 2: # no args are passed, pop up GUI
@@ -94,7 +95,9 @@ if len(sys.argv) < 2: # no args are passed, pop up GUI
                 self.l_text = self.lh.text
 
             print("Saving score to output.xml")
-            print("\n" + self.r_text + " t1: " + self.l_text)
+            finger_text = self.r_text + " t1: " + self.l_text + " "
+            pyperclip.copy(finger_text)
+            print(finger_text)
             sf.write('xml', fp='output.xml')
             print("\nTo visualize score type:\n musescore output.xml\n")
 
@@ -215,9 +218,12 @@ else: ##########################################################################
         lh.generate(args.start_measure, args.n_measures)
         l_text = lh.text
 
-    print("\n" + r_text + " t1: " + l_text)
-    print("rhand: ", len(r_text))
-    print("lhand: ", len(l_text))
+    # print("\n" + r_text + " t1: " + l_text)
+    # print("rhand: ", len(r_text))
+    # print("lhand: ", len(l_text))
+    finger_text = r_text + " t1: " + l_text + " "
+    pyperclip.copy(finger_text)
+    print(finger_text)
     sf.write('xml', fp=args.outputfile)
 
 

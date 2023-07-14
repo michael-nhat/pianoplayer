@@ -4,7 +4,13 @@ Created on Thu Nov 26 19:22:20 2015
 @author: marco musy
 """
 from pianoplayer.utils import keypos
+from pprint import pprint
 
+def ppprint(obj):
+    for attr in dir(obj):
+        # Getting rid of dunder methods
+        if not attr.startswith("__"):
+            print(attr)
 #####################################################
 class INote:
     def __init__(self):
@@ -49,6 +55,17 @@ def reader(sf, beam=0):
     chordID = 0
 
     for n in strm:
+        # pprint(vars(n))
+        a = None
+        a = n.measureNumber
+        if a == 37:
+            print("measure pre:", n.measureNumber, pprint(vars(n)))
+            if hasattr(n, 'isNote'):
+                print("37xx Note", n.isNote)
+            elif hasattr(n, 'isChord'):
+                print("37xx Chord", n.isChord)
+            else:
+                print("37xx WTF")
 
         if n.duration.quarterLength==0 :
             print("note no length: might need correct", n)
@@ -60,6 +77,7 @@ def reader(sf, beam=0):
                 # and for some other not numbering, must add character x on it
                 an        = INote()
                 an.noteID += 1
+                an.isChord = n.isChord
                 an.note21 = n
                 an.nh_type = "tied"
                 an.measure = n.measureNumber
@@ -67,9 +85,10 @@ def reader(sf, beam=0):
                 continue
 
         if n.isNote:
-            if len(noteseq) and n.offset == noteseq[-1].time:
-                # print "doppia nota", n.name
-                continue
+            # if len(noteseq) and n.offset == noteseq[-1].time:
+            #     # print "doppia nota", n.name
+            #     print("wtf here","len",  len(noteseq),"offset",  n.offset,"notexx", noteseq[-1].time)
+            #     continue
             an        = INote()
             an.noteID += 1
             an.note21 = n
@@ -92,6 +111,7 @@ def reader(sf, beam=0):
 
         elif n.isChord:
 
+            # print(n.isChord)
             # this never if
             if n.tie and (n.tie.type=='continue' or n.tie.type=='stop'): continue
             sfasam = 0.05 # sfasa leggermente le note dell'accordo
@@ -117,6 +137,8 @@ def reader(sf, beam=0):
                 if pc in [1, 3, 6, 8, 10]: an.isBlack = True
                 else: an.isBlack = False
                 noteseq.append(an)
+        else:
+            print("might we miss st?")
 
             chordID += 1
 
