@@ -35,7 +35,7 @@
                         (vterm-send-key (kbd "SPC"))
                         ;; create nh-vterm-send-string
                         ;; activate first
-                        (vterm-send-string "pip install --upgrade --no-deps .\n")
+                        (vterm-send-string "pip install --upgrade.\n")
                         ;; (vterm-send-string "python setup.py sdist bdist_wheel")
                         (select-window pre-current-window)))
 
