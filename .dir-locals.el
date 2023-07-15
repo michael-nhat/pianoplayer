@@ -53,6 +53,9 @@
                         (vterm-send-key (kbd "SPC"))
                         ;; create nh-vterm-send-string
                         ;; activate first
+                        ;; global
+                        ;; python setup.py clean --all
+                        ;; pip install .
                         (vterm-send-string "pip install --upgrade --no-deps .\n")
                         ;; (vterm-send-string "python setup.py sdist bdist_wheel")
                         (vterm-send-string "pianoplayer\n")
