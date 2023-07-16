@@ -224,6 +224,24 @@ class Hand:
                     print("log note:", an.note21)
                 continue
 
+            elif an.nh_type == "no-duration":
+                # add for tie, because: is note in xml but not midi-note (add character t)
+                # and for some other not numbering, must add character x on it
+                print("no-duration note or chord")
+                # seem it ignore if a chord tied
+                if an.isChord == True:
+                    print("log chord:", an.note21)
+                    t_chord = an.note21
+                    for n in t_chord.notes:
+                        print("no duration notes in chord")
+                        an.note21.addLyric("D")
+                        self.text = self.text + "-"
+                else:
+                    print("no duration a note  ")
+                    an.note21.addLyric("d")
+                    self.text = self.text + "-"
+                continue
+
             a = None
             a = an.measure
             if a == 37:

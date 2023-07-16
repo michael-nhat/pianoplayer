@@ -5,6 +5,7 @@ Created on Thu Nov 26 19:22:20 2015
 """
 from pianoplayer.utils import keypos
 from pprint import pprint
+from music21 import note, chord
 
 def ppprint(obj):
     for attr in dir(obj):
@@ -68,7 +69,21 @@ def reader(sf, beam=0):
                 print("37xx WTF")
 
         if n.duration.quarterLength==0 :
-            print("note no length: might need correct", n)
+            print("note no length: might need correct", n, "meas: " , n.measureNumber, type(n))
+            isC = None
+            if hasattr(n, 'isNote'):
+                isC = not n.isNote
+            elif hasattr(n, 'isChord'):
+                isC = n.isChord
+            if isC != None:
+                print("corrected a note or chord")
+                an        = INote()
+                an.noteID += 1
+                an.isChord = isC
+                an.note21 = n
+                an.nh_type = "no-duration"
+                an.measure = n.measureNumber
+                noteseq.append(an)
             continue
 
         if hasattr(n, 'tie'): # address bug https://github.com/marcomusy/pianoplayer/issues/29

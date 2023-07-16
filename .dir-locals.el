@@ -35,7 +35,7 @@
                         (vterm-send-key (kbd "SPC"))
                         ;; create nh-vterm-send-string
                         ;; activate first
-                        (vterm-send-string "pip install --upgrade.\n")
+                        (vterm-send-string "pip install --upgrade .\n")
                         ;; (vterm-send-string "python setup.py sdist bdist_wheel")
                         (select-window pre-current-window)))
 
@@ -46,6 +46,7 @@
                         (if (not (get-buffer buffer-name))
                             (progn
                               (switch-to-buffer (get-buffer-create buffer-name))
+                              (vterm)
                               (vterm-mode)))
                         (pop-to-buffer buffer-name 'action nil)
                         (vterm-send-key (kbd "C-c"))
